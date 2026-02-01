@@ -18,7 +18,7 @@ export async function sendTenantAdminInvitation(email: string, tenantName: strin
     }
     try {
         // Get from email from environment, fallback to Resend test domain
-        const fromEmail = process.env.RESEND_FROM_EMAIL || 'CursorSchool <onboarding@resend.dev>';
+        const fromEmail = process.env.RESEND_FROM_EMAIL || 'BurstBrain School <onboarding@resend.dev>';
         const data = await resend.emails.send({
             from: fromEmail,
             to: email,
@@ -26,7 +26,7 @@ export async function sendTenantAdminInvitation(email: string, tenantName: strin
             html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                     <h1>You've been invited!</h1>
-                    <p>You have been added as an administrator for <strong>${tenantName}</strong> on CursorSchool.</p>
+                    <p>You have been added as an administrator for <strong>${tenantName}</strong> on BurstBrain School.</p>
                     <p>Click the button below to access your dashboard:</p>
                     <a href="${inviteUrl}" style="display: inline-block; background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin-top: 10px;">
                         Access Dashboard
@@ -52,7 +52,7 @@ export async function sendTenantAdminPromotion(email: string, tenantName: string
     }
     try {
         // Get from email from environment, fallback to Resend test domain
-        const fromEmail = process.env.RESEND_FROM_EMAIL || 'CursorSchool <onboarding@resend.dev>';
+        const fromEmail = process.env.RESEND_FROM_EMAIL || 'BurstBrain School <onboarding@resend.dev>';
         const data = await resend.emails.send({
             from: fromEmail,
             to: email,

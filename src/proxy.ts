@@ -32,7 +32,7 @@ export default clerkMiddleware(
 
     let tenantSlug: string | null = null;
     // Get root domain from environment variable, fallback to local for development
-    const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "local.cursorschool.test";
+    const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "local.burstbrain.test";
 
     // 1. Subdomain routing
     if (hostname.endsWith(rootDomain) && hostname !== rootDomain) {

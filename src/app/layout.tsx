@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "CursorSchool  Multi-Tenant School SaaS",
+  title: "BurstBrain School - Multi-Tenant School SaaS",
   description: "The modern school management system",
 };
 
@@ -16,7 +16,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: "#2563eb",
+        },
+      }}
+    >
       <html lang="en">
         <body className={inter.className}>
           {children}

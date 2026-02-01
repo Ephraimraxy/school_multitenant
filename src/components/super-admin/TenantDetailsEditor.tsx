@@ -33,7 +33,7 @@ export function TenantDetailsEditor({
 
     const isSecure = process.env.NODE_ENV === 'production';
     const protocol = isSecure ? 'https' : 'http';
-    const rootDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'local.cursorschool.test:3000';
+    const rootDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'local.burstbrain.test:3000';
 
     // Fallback Domain Logic
     const constructedDomain = `${protocol}://${formData.slug}.${rootDomain}`;
