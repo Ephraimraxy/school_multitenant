@@ -1,0 +1,24 @@
+# Netlify Configuration
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20.9.0"
+  SECREVALIDATE_TOKEN = "cursorschool-secret-2025"
+  SECRETS_SCAN_OMIT_KEYS = "CLERK_SECRET_KEY,DATABASE_URL,NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"
+
+# Redirect all requests to Next.js
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"

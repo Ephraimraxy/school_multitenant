@@ -1,0 +1,57 @@
+# ============================================
+# Railway Deployment - Environment Variables
+# Copy this file to .env.example or .env.local
+# ============================================
+
+# Database (Railway PostgreSQL)
+# Get this from Railway PostgreSQL service → Variables tab
+DATABASE_URL=postgresql://user:password@host:port/database?sslmode=require
+
+# ============================================
+# Clerk Authentication
+# ============================================
+# Get these from Clerk Dashboard → API Keys
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+
+# ============================================
+# Resend Email Service
+# ============================================
+# Get API key from Resend Dashboard → API Keys
+RESEND_API_KEY=re_...
+# Configure your verified domain in Resend, then use:
+RESEND_FROM_EMAIL=noreply@yourdomain.com
+# Or use Resend's test domain (for development):
+# RESEND_FROM_EMAIL=onboarding@resend.dev
+
+# ============================================
+# Application Configuration
+# ============================================
+# Your Railway app URL (will be provided after deployment)
+NEXT_PUBLIC_APP_URL=https://your-app.railway.app
+# Or your custom domain:
+# NEXT_PUBLIC_APP_URL=https://yourdomain.com
+
+# Super Admin Email (for accessing /super-admin)
+NEXT_PUBLIC_SUPER_ADMIN_EMAIL=admin@yourdomain.com
+
+# Root Domain for Multi-Tenant Subdomain Routing
+# For Railway: use your custom domain (e.g., yourdomain.com)
+# For development: use local.cursorschool.test
+NEXT_PUBLIC_ROOT_DOMAIN=yourdomain.com
+# Or for local development:
+# NEXT_PUBLIC_ROOT_DOMAIN=local.cursorschool.test
+
+# ============================================
+# Node Environment
+# ============================================
+NODE_ENV=production
+
+# ============================================
+# Optional: UploadThing (if using file uploads)
+# ============================================
+# UPLOADTHING_SECRET=sk_live_...
+# UPLOADTHING_APP_ID=...
+
