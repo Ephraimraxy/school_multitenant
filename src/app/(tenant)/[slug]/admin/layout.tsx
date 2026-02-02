@@ -1,8 +1,11 @@
 import { redirect } from "next/navigation";
-import { currentUser, auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { getTenantBySlug } from "@/lib/actions/tenants";
 import { TenantAdminSidebar } from "@/components/tenant-admin/TenantAdminSidebar";
 import { TenantBrandingProvider } from "@/components/branding/TenantBrandingProvider";
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export default async function TenantAdminLayout({
     children,
@@ -12,8 +15,7 @@ export default async function TenantAdminLayout({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
-    const user = await currentUser();
-    const { orgId, orgRole } = await auth();
+  const user = await currentUser();
 
     // Check if user is authenticated
     if (!user) {
@@ -27,15 +29,54 @@ export default async function TenantAdminLayout({
         redirect("/");
     }
 
-    // Check if user is tenant admin
-    const isTenantAdmin = !!(
-        orgId === tenant.id &&
-        (orgRole === "org:admin" || orgRole === "org:creator")
-    );
+  // Resolve current app user from Clerk user
+  const primaryEmail = user.emailAddresses?.[0]?.emailAddress || "";
+
+  // 1) Try to find by Clerk ID
+  let dbUser =
+    (await db.query.users.findFirst({
+      where: eq(users.clerkId, user.id),
+    })) || null;
+
+  // 2) If not found, try to attach existing invited user by email
+  if (!dbUser && primaryEmail) {
+    const invitedUser = await db.query.users.findFirst({
+      where: eq(users.email, primaryEmail),
+    });
+
+    if (invitedUser) {
+      await db
+        .update(users)
+        .set({ clerkId: user.id })
+        .where(eq(users.id, invitedUser.id));
+
+      dbUser = { ...invitedUser, clerkId: user.id };
+    }
+  }
+
+  // 3) Still not found → create a basic user row
+  if (!dbUser) {
+    const [created] = await db
+      .insert(users)
+      .values({
+        clerkId: user.id,
+        email: primaryEmail || user.id,
+        displayName:
+          user.firstName || user.lastName
+            ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
+            : primaryEmail || user.id,
+      })
+      .returning();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dbUser = created as any;
+  }
+
+  // Final authorization: must be tenant_admin for this tenant
+  const isTenantAdmin =
+    dbUser.role === "tenant_admin" && dbUser.tenantId === tenant.id;
 
     if (!isTenantAdmin) {
-        // Check if user has tenant_admin role in database
-        // For now, redirect to tenant landing page
         redirect(`/${slug}`);
     }
 

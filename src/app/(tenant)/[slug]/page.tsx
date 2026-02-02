@@ -1,7 +1,7 @@
-import { currentUser, auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { tenants } from "@/lib/db/schema";
+import { tenants, users } from "@/lib/db/schema";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,14 +94,30 @@ export default async function TenantPage({
 }) {
   const { slug } = await params;
   const user = await currentUser();
-  const { orgId, orgRole, userId } = await auth();
 
   // Fetch Tenant Data from DB
-  let tenant = await getTenantBranding(slug);
+  const tenant = await getTenantBranding(slug);
 
-  // ... (rest of the logic) ...
+  // Resolve current app user from Clerk user for tenant-admin checks
+  let isTenantAdmin = false;
+  if (user && tenant) {
+    const primaryEmail = user.emailAddresses?.[0]?.emailAddress || "";
 
-  const isTenantAdmin = !!(user && tenant && orgId === tenant.id && (orgRole === 'org:admin' || orgRole === 'org:creator')); // Adjust roles as needed
+    // Try to resolve user record from DB
+    const dbUser =
+      (await db.query.users.findFirst({
+        where: eq(users.clerkId, user.id),
+      })) ||
+      (primaryEmail
+        ? await db.query.users.findFirst({
+            where: eq(users.email, primaryEmail),
+          })
+        : null);
+
+    if (dbUser && dbUser.role === "tenant_admin" && dbUser.tenantId === tenant.id) {
+      isTenantAdmin = true;
+    }
+  }
 
   // ... (branding logic) ...
   const branding = tenant?.branding as any || {};
@@ -155,9 +171,9 @@ export default async function TenantPage({
               </div>
 
               <div className="flex gap-4">
-                {user ? (
+                {isTenantAdmin ? (
                   <Button asChild className="bg-[var(--primary)] text-[var(--primary-foreground)] hover:brightness-90">
-                    <Link href="/dashboard">Dashboard</Link>
+                    <Link href={`/${slug}/admin`}>Open Admin Panel</Link>
                   </Button>
                 ) : (
                   <Button asChild className="bg-[var(--primary)] text-[var(--primary-foreground)] hover:brightness-90">
